@@ -29,6 +29,7 @@ adminRouter.post("/signup", async function(req, res) {
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(validated.password, 10);
+        console.log("Hashed Password:", hashedPassword); // Debugging line
 
         // Create admin in the database
         const admin = await adminModel.create({
@@ -54,7 +55,7 @@ adminRouter.post("/signup", async function(req, res) {
             });
         }
         
-        // For other errors, you may want to respond with a generic error message
+        // For other errors, respond with a generic error message
         res.status(500).json({
             message: "An error occurred during signup",
             error: error.message,
@@ -63,59 +64,82 @@ adminRouter.post("/signup", async function(req, res) {
 });
 
 
-adminRouter.post("/signin", async function(req, res) {
-    const {email , password} = req.body;
+// adminRouter.post("/signin", async function(req, res) {
+//     const {email , password} = req.body;
 
-    // TODO: ideally password should be hashed, and hence you cant compare the user provided password and the database password
-    // but what we are doing here is just checking if the email and password are correct but the password is hashed in the database so we need to use bcrypt library to hash it 
+//     // TODO: ideally password should be hashed, and hence you cant compare the user provided password and the database password
+//     // but what we are doing here is just checking if the email and password are correct but the password is hashed in the database so we need to use bcrypt library to hash it 
 
-   const admin = await adminMOdel.findOne({
-     email : email,
-     password: await bcrypt.hash(password,10)
-   })
+//    const admin = await adminMOdel.findOne({
+//      email : email,
+//      password: await bcrypt.hash(password,10)
+//    })
 
-   if(admin){
-    const token = jwt.sign({
-        id: admin._id
-    }, JWT_ADMIN_PASSWORD);
-   }
+//    if(admin){
+//     const token = jwt.sign({
+//         id: admin._id
+//     }, JWT_ADMIN_PASSWORD);
 
-   // in total we have three types of authentication 
-   // 1. cookie based authentication 
-   // 2. token based authentication 
-   // 3. session based authentication
-   // here we are doing token based authentication 
-   // so we are sending the token in the response 
-   // and we are decoding the token in the frontend
-   // to verify the user
+//    // in total we have three types of authentication 
+//    // 1. cookie based authentication 
+//    // 2. token based authentication 
+//    // 3. session based authentication
+//    // here we are doing token based authentication 
+//    // so we are sending the token in the response 
+//    // and we are decoding the token in the frontend
+//    // to verify the user
     
-   res.json({
-    token:token
-   })
-    // const { email, password } = req.body;
+//    res.json({
+//     token:token
+//    })
+// }else {
+//     res.status(403).json({
+//         message: "Incorrect credentials",
+//         error: "Admin not found",
+//         status: 403,
+//         success: false,
+//         data: null,
+//     })
+// }
+// })
+adminRouter.post("/signin", async function(req, res) {
+    const { email, password } = req.body;
 
-    // // TODO: ideally password should be hashed, and hence you cant compare the user provided password and the database password
-    // const admin = await adminModel.findOne({
-    //     email: email,
-    //     password: password
-    // });
+    try {
+        // Ideally, password should be hashed, and hence you can't compare the user-provided password and the database password
+        // Here we are just checking if the email and password are correct but the password is hashed in the database
+        const admin = await adminModel.findOne({ email });
 
-    // if (admin) {
-    //     const token = jwt.sign({
-    //         id: admin._id
-    //     }, JWT_ADMIN_PASSWORD);
+        // If admin is found, compare the hashed password
+        if (admin && await bcrypt.compare(password, admin.password)) {
+            const token = jwt.sign({
+                id: admin._id
+            }, JWT_ADMIN_PASSWORD);
 
-    //     // Do cookie logic
-
-    //     res.json({
-    //         token: token
-    //     })
-    // } else {
-    //     res.status(403).json({
-    //         message: "Incorrect credentials"
-    //     })
-    // }
-})
+            // Token based authentication
+            res.json({
+                token: token
+            });
+        } else {
+            res.status(403).json({
+                message: "Incorrect credentials",
+                error: "Admin not found",
+                status: 403,
+                success: false,
+                data: null,
+            });
+        }
+    } catch (error) {
+        // Handle any unexpected errors
+        res.status(500).json({
+            message: "An error occurred while processing your request.",
+            error: { cause: error.message },
+            status: 500,
+            success: false,
+            data: null,
+        });
+    }
+});
 
 adminRouter.post("/course", adminMiddleware, async function(req, res) {
     // const adminId = req.userId;
