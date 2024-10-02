@@ -6,7 +6,7 @@ function userMiddleware(req, res, next) {
     try{
         const decoded = jwt.verify(token, JWT_USER_PASSWORD);
         if(decoded){
-            req.userId= decode.id;
+            req.userId= decoded.id;
             next();
         }
         else{
