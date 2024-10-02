@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 
 const userSchema = new Schema({
+    // id will automatically be added by mongoose
     email: { type: String, unique: true },
     password: String,
     firstName: String,
@@ -27,6 +28,8 @@ const courseSchema = new Schema({
 });
 
 const purchaseSchema = new Schema({
+    // but why we have added the userId here ???
+    // because we want to know who purchased the course 
     userId: ObjectId,
     courseId: ObjectId
 });

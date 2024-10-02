@@ -14,6 +14,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/course", courseRouter);
 
+
 async function main() {
     await mongoose.connect(process.env.MONGO_URL)
     app.listen(3000);
