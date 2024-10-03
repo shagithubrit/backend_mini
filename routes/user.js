@@ -145,6 +145,11 @@ userRouter.get("/purchases", userMiddleware, async function(req, res) {
         purchasedCourseIds.push(purchases[i].courseId)
     }
 
+
+    // WHAT DOES THIS COURSE DATA DO??
+    // THIS IS WHERE WE ARE FETCHING THE COURSE DATA
+    // WE ARE FETCHING THE COURSE DATA BASED ON THE COURSE IDS
+    // WHICH WE HAVE FETCHED FROM THE PURCHASES
     const coursesData = await courseModel.find({
         _id: { $in: purchasedCourseIds }
     })
