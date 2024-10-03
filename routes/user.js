@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const { userModel, purchaseModel, courseModel } = require("../db");
 const jwt = require("jsonwebtoken");
+const bcrypt= require("bcrypt");
+const zod = require('zod');
 const  { JWT_USER_PASSWORD } = require("../config");
 const { userMiddleware } = require("../middleware/user");
 

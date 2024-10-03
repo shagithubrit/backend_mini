@@ -142,58 +142,95 @@ adminRouter.post("/signin", async function(req, res) {
 });
 
 adminRouter.post("/course", adminMiddleware, async function(req, res) {
-    // const adminId = req.userId;
+    const adminId = req.userId;
 
-    // const { title, description, imageUrl, price } = req.body;
+    const { title, description, imageUrl, price } = req.body;
 
+    try{
     // // creating a web3 saas in 6 hours
-    // const course = await courseModel.create({
-    //     title: title, 
-    //     description: description, 
-    //     imageUrl: imageUrl, 
-    //     price: price, 
-    //     creatorId: adminId
-    // })
-
-    // res.json({
-    //     message: "Course created",
-    //     courseId: course._id
-    // })
+    const course = await courseModel.create({
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        price: price,
+        creatorId: adminId,
+    })
+    res.json({
+        message : "Cousre created successfully",
+        course,
+        success : true,
+        status :200,
+        data :null,
+    })
+}catch(error){
+    res.status(500).json({
+        message : "An error occured while creating course",
+        error : error.message,
+        success : false,
+        status : 500,
+        data : null,
+    })
+}
 })
 
+
 adminRouter.put("/course", adminMiddleware, async function(req, res) {
-    // const adminId = req.userId;
+    const adminId =  req.userId;
 
-    // const { title, description, imageUrl, price, courseId } = req.body;
+    const { title, description, imageUrl, price, courseId } = req.body;
 
-    // // creating a web3 saas in 6 hours
-    // const course = await courseModel.updateOne({
-    //     _id: courseId, 
-    //     creatorId: adminId 
-    // }, {
-    //     title: title, 
-    //     description: description, 
-    //     imageUrl: imageUrl, 
-    //     price: price
-    // })
+    try{
+    const course = await courseModel.updateOne({
+        _id:courseId,
+        creatorId:adminId
+    },{
+        title:title,
+        description:description,
+        imageUrl: imageUrl,
+        price: price,
+    })
+    res.json({
+        message : "Course updated successfully",
+        courseId: course._id,
+        success :true,
+        error :false 
 
-    // res.json({
-    //     message: "Course updated",
-    //     courseId: course._id
-    // })
+    })
+}catch(error){
+    res.status(500).json({
+        message: "An error occured while updating course",
+        error: error.message,
+        success: false,
+        status: 500,    
+    })
+}
 })
 
 adminRouter.get("/course/bulk", adminMiddleware,async function(req, res) {
-    // const adminId = req.userId;
-
-    // const courses = await courseModel.find({
-    //     creatorId: adminId 
-    // });
-
-    // res.json({
-    //     message: "Course updated",
-    //     courses
-    // })
+    const adminId = req.userId;
+    try{
+    const courses = await courseModel.find({
+        creatorId: adminId,
+        status: "published",
+        isFeatured: true,
+        isActive: true,
+    })
+    res.json({
+        message : "Courses fetched successfully",
+        courses,
+        success : true,
+        status : 200,
+        data : null,
+    })
+}catch(error){
+    res.status(500).json({
+        message : "An error occured while fetching courses",
+        error : error.message,
+        success: false,
+        status :500,
+        data : null,
+    })
+}
 })
 
 module.exports = {
